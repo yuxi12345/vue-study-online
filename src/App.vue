@@ -8,6 +8,7 @@
           <li class="nav-item"><router-link to="/register">注册</router-link></li>
           <li class="nav-item"><router-link to="/profile">个人信息</router-link></li>
           <li class="nav-item"><router-link to="/preferences">学习偏好设置</router-link></li>
+          <li class="nav-item"><router-link to="/courses">课程中心</router-link></li>
         </ul>
       </nav>
     </header>
