@@ -60,16 +60,6 @@
         </div>
       </div>
 
-      <!-- 学习按钮 -->
-      <div class="action-container">
-        <router-link :to="`/courses/${course.id}/learn`" class="btn btn-primary">
-          开始学习（视频）
-        </router-link>
-        <router-link :to="`/courses/${course.id}/text-learn`" class="btn btn-primary">
-          开始学习（文字）
-        </router-link>
-      </div>
-      
       <!-- 课程详情 -->
       <div class="course-detail">
         <!-- 大纲模块 -->

@@ -9,7 +9,6 @@
           <li class="nav-item"><router-link to="/profile">个人信息</router-link></li>
           <li class="nav-item"><router-link to="/preferences">学习偏好设置</router-link></li>
           <li class="nav-item"><router-link to="/courses">课程中心</router-link></li>
-          <li class="nav-item"><router-link to="/courses/1/learn">学习课程</router-link></li> <!-- 新增学习课程链接 -->
         </ul>
       </nav>
     </header>
@@ -88,3 +87,4 @@
   color: white;
 }
 </style>
+

@@ -69,7 +69,6 @@
           开始学习（文字）
         </router-link>
       </div>
-      
       <!-- 课程详情 -->
       <div class="course-detail">
         <!-- 大纲模块 -->
