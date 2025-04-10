@@ -15,7 +15,7 @@
     <div class="course-grid">
       <div v-for="course in filteredCourses" :key="course.id" class="course-card">
         <router-link :to="`/courses/${course.id}`" class="course-link">
-          <img :src="course.cover" :alt="course.title" class="course-cover" />
+          <img src="https://file.psd.cn/20211216A/vrmraq2qxa0_PSD_cn.jpg" :alt="course.title" class="course-cover" />
           <div class="course-info">
             <h3 class="course-title">{{ course.title }}</h3>
             <p class="instructor">讲师: {{ course.instructor }}</p>

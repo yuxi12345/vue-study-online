@@ -1,4 +1,7 @@
 <template>
+  <div class="course-info">
+      <div class="course-title">{{ course.title }}</div>
+    </div>
   <div class="course-player-container">
     <div class="video-player">
       <video ref="videoPlayer" controls>
@@ -39,7 +42,7 @@ const notes = ref('');
 const course = ref({
   id: 1,
   title: 'Vue3 入门实战',
-  videoUrl: 'https://fd.aigei.com/src/vdo/mp4/85/851d77b00b1c4f7fbe1dbb94ec0a362a.mp4?e=1743567540&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:bmc5ShhPUpXGOjHNCR6fHb9Zw54=', // 替换为实际视频URL
+  videoUrl: "https://sf1-cdn-tos.huoshanstatic.com/obj/media-fe/xgplayer_doc_video/mp4/xgplayer-demo-360p.mp4", // 替换为实际视频URL
   subtitles: 'https://example.com/subtitles.vtt', // 替换为实际字幕URL
 });
 
@@ -181,5 +184,9 @@ const toggleFullscreen = () => {
 .notes-section textarea:focus {
   border-color: #42b983;
   outline: none;
+}
+.course-title{
+  font-size: 24px;
+  font-weight: 600;
 }
 </style>

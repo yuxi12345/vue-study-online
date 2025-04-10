@@ -6,10 +6,10 @@
            :key="msg.id"
            class="toast"
            :class="msg.type">
-        {{ msg.text }}
+        <span class="toast-text">{{ msg.text }}</span>
       </div>
     </transition-group>
-
+  </div>
   <!-- 主容器 -->
   <div class="course-wrapper">
     <!-- 核心内容区 -->
@@ -25,10 +25,7 @@
 
       <!-- 视频预览 -->
       <div class="video-container">
-        <iframe :src="course.videoUrl" 
-                frameborder="0" 
-                allowfullscreen
-                title="课程预览视频"></iframe>
+        <video width="100%" autoplay controls src="https://sf1-cdn-tos.huoshanstatic.com/obj/media-fe/xgplayer_doc_video/mp4/xgplayer-demo-360p.mp4"></video>
       </div>
 
       <!-- 操作按钮组 -->
@@ -79,8 +76,11 @@
             <li v-for="(chapter, index) in course.chapters" 
                 :key="index"
                 class="chapter-item">
-              <span class="chapter-index">第{{ index + 1 }}章</span>
-              {{ chapter }}
+              <div class="chapter-content">
+              <span>第{{ index + 1 }}章</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <span class="chapter-title">{{ chapter }}</span>
+            </div>
             </li>
           </ul>
         </section>
@@ -105,8 +105,8 @@
           <div v-for="qa in course.faqs" 
                :key="qa.question"
                class="faq-card">
-            <div class="faq-question">Q: {{ qa.question }}</div>
-            <div class="faq-answer">A: {{ qa.answer }}</div>
+            <div class="faq-question">张三: {{ qa.question }}</div>
+            <div class="faq-answer">李四: {{ qa.answer }}</div>
           </div>
         </section>
       </div>
@@ -132,12 +132,34 @@
         </div>
       </div>
     </aside>
+
+<section class="detail-section">
+  <h2 class="section-title">🎮 课程互动</h2>
+  <div class="interaction-nav">
+    <router-link 
+  :to="`/courses/${course.id}/discussion`" 
+  class="nav-button"
+  active-class="active">
+  讨论区
+</router-link>
+
+<router-link 
+  :to="`/courses/${course.id}/qa`" 
+  class="nav-button"
+  active-class="active">
+  问答社区
+</router-link>
   </div>
+</section>
+
+<!-- 添加路由出口 -->
+<router-view></router-view>
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, provide } from 'vue'
 
 // 课程数据
 const course = ref({
@@ -173,6 +195,8 @@ const course = ref({
     }
   ]
 });
+
+provide('currentCourse', course)
 
 // 交互状态
 const isFavorited = ref(false);
@@ -213,6 +237,7 @@ const handlePurchase = () => {
   purchased.value = true;
   showToast('🎉 购买成功！课程已添加到学习中心', 'success');
 };
+
 </script>
 
 <style scoped>
@@ -255,12 +280,11 @@ const handlePurchase = () => {
 
 /* 视频容器 */
 .video-container {
+  display: flex;
   position: relative;
-  padding-bottom: 56.25%;
   margin: 1.5rem 0;
   border-radius: 8px;
   overflow: hidden;
-  background: #000;
 }
 
 .video-container iframe {
@@ -293,6 +317,7 @@ const handlePurchase = () => {
   background: #00c853;
   color: white;
   font-size: 1.1rem;
+  text-decoration: none;
 }
 
 .btn-primary:hover {
@@ -319,6 +344,7 @@ const handlePurchase = () => {
 
 /* 详情模块 */
 .detail-section {
+  margin: 0 auto;
   margin: 2rem 0;
   padding: 1.5rem;
   background: #f8f9fa;
@@ -330,7 +356,12 @@ const handlePurchase = () => {
   color: #1a1a1a;
   margin-bottom: 1rem;
 }
-
+.chapter-content{
+  text-align: left;
+}
+.chapter-list{
+  text-indent: 37%; 
+}
 /* 侧边栏 */
 .course-sidebar {
   position: sticky;
@@ -372,6 +403,8 @@ const handlePurchase = () => {
   top: 2rem;
   right: 2rem;
   z-index: 9999;
+  max-height: 50vh; /* 设置最大高度 */
+  overflow-y: auto; /* 添加垂直滚动条 */
 }
 
 .toast {
@@ -406,6 +439,33 @@ const handlePurchase = () => {
 .toast-leave-to {
   opacity: 0;
   transform: translateY(-20%);
+}
+
+/* 添加互动模块样式 */
+.interaction-nav {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.nav-button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  background: #f5f7fa;
+  color: #606266;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-button.active {
+  background: #409eff;
+  color: white;
+}
+
+.nav-button i {
+  font-size: 1.2em;
 }
 
 @media (max-width: 768px) {

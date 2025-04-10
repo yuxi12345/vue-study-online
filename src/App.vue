@@ -10,6 +10,8 @@
           <li class="nav-item"><router-link to="/preferences">学习偏好设置</router-link></li>
           <li class="nav-item"><router-link to="/courses">课程中心</router-link></li>
           <li class="nav-item"><router-link to="/courses/1/learn">学习课程</router-link></li> <!-- 新增学习课程链接 -->
+          <li class="nav-item"><router-link to="/dashboard">数据看板</router-link></li>
+          
         </ul>
       </nav>
     </header>

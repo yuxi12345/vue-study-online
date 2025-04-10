@@ -9,7 +9,11 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
+  
   ],
+  server: {
+    allowedHosts: ['win.yuxi6.cn'], // 添加允许的主机
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
