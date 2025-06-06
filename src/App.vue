@@ -4,14 +4,24 @@
       <h1 class="app-title">在线学习平台</h1>
       <nav class="app-nav">
         <ul class="nav-list">
-          <li class="nav-item"><router-link to="/login">登录</router-link></li>
-          <li class="nav-item"><router-link to="/register">注册</router-link></li>
-          <li class="nav-item"><router-link to="/profile">个人信息</router-link></li>
-          <li class="nav-item"><router-link to="/preferences">学习偏好设置</router-link></li>
-          <li class="nav-item"><router-link to="/courses">课程中心</router-link></li>
-          <li class="nav-item"><router-link to="/courses/1/learn">学习课程</router-link></li> <!-- 新增学习课程链接 -->
-          <li class="nav-item"><router-link to="/dashboard">数据看板</router-link></li>
-          
+          <li class="nav-item">
+
+            <el-button type="primary">
+              <router-link to="/register">注册</router-link>
+            </el-button>
+
+            <el-button type="danger">
+              <router-link to="/login">登录</router-link>
+            </el-button>
+
+            
+            <el-button type="warning" @click="logout">退出</el-button>
+
+
+
+
+          </li>
+
         </ul>
       </nav>
     </header>
@@ -19,13 +29,27 @@
       <router-view />
     </main>
     <footer class="app-footer">
-      <p>© 2025 在线学习平台. 版权所有.</p>
+      <p>school</p>
     </footer>
   </div>
 </template>
 
 <script setup>
-// 这里不需要额外的逻辑
+import { ElMessage } from 'element-plus'; // 如果使用 Element Plus
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const logout = () => {
+  // 清除 token
+  localStorage.removeItem('token');
+  // 如果有其他用户数据，也可以清除
+  localStorage.removeItem('userData'); // 示例：清除用户数据
+  // 提示用户
+  ElMessage.success("退出成功，用户数据已删除"); // 使用 Element Plus 的消息提示
+  // 重定向到登录页面
+  router.push('/login');
+};
+
 </script>
 
 <style scoped>

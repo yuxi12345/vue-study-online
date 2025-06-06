@@ -1,154 +1,248 @@
+// 2025.6.5
+// 正常调用
 <template>
   <div class="course-list-container">
-    <div class="filter-section">
-      <select v-model="selectedCategory" class="filter-select">
-        <option value="">所有类别</option>
-        <option v-for="category in categories" :key="category">{{ category }}</option>
-      </select>
-      <select v-model="sortBy" class="filter-select">
-        <option value="hot">热门程度</option>
-        <option value="new">最新发布</option>
-      </select>
-      <input type="text" v-model="searchQuery" placeholder="搜索课程..." class="search-input" />
-    </div>
+    <h2 class="text-2xl font-bold mb-5">课程中心</h2>
 
-    <div class="course-grid">
-      <div v-for="course in filteredCourses" :key="course.id" class="course-card">
-        <router-link :to="`/courses/${course.id}`" class="course-link">
-          <img src="https://file.psd.cn/20211216A/vrmraq2qxa0_PSD_cn.jpg" :alt="course.title" class="course-cover" />
-          <div class="course-info">
-            <h3 class="course-title">{{ course.title }}</h3>
-            <p class="instructor">讲师: {{ course.instructor }}</p>
-            <div class="rating-section">
-              <span class="rating">{{ course.rating.toFixed(1) }}</span>
-              <div class="stars">
-                <span v-for="i in 5" :key="i" class="star" :class="{ filled: i <= Math.round(course.rating) }">★</span>
-              </div>
-              <span class="students">({{ course.students }}人)</span>
-            </div>
-          </div>
-        </router-link>
-      </div>
+    <form @submit.prevent="addCourse" class="add-course-form mb-5">
+      <input v-model="newCourse.title" type="text" placeholder="课程标题" required class="input-field" />
+      <input v-model="newCourse.instructor" type="text" placeholder="授课老师" required class="input-field" />
+      <input v-model="newCourse.duration" type="number" placeholder="课程时长（分钟）" required class="input-field" />
+      <input v-model="newCourse.url" type="text" placeholder="课程链接" required class="input-field" />
+      <button type="submit" class="submit-button">添加课程</button>
+    </form>
+
+    <div v-if="loading" class="loading-message">加载中...</div>
+    <div v-if="error" class="error-message">{{ error }}</div>
+
+    <table v-if="!loading && courses.length" class="course-table">
+      <thead>
+        <tr>
+          <th>课程 ID</th>
+          <th>课程标题</th>
+          <th>授课老师</th>
+          <th>课程时长 (分钟)</th>
+          <th>视频播放</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="course in courses" :key="course.id">
+          <td>{{ course.id }}</td>
+          <td>{{ course.title }}</td>
+          <td>{{ course.instructor }}</td>
+          <td>{{ course.duration }}</td>
+          <td>
+            <a :href="course.url" target="_blank" class="video-link">观看视频</a>
+          </td>
+          <td>
+            <button @click="removeCourse(course.id)" class="action-button delete-button">删除</button>
+            <button @click="editCourse(course)" class="action-button edit-button">编辑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <el-button type="primary" round><router-link to="/nav">返回</router-link></el-button>
+
+    <div v-if="editingCourse" class="edit-course-form">
+      <h3 class="text-xl font-semibold mb-4">编辑课程</h3>
+      <input v-model="editingCourse.title" type="text" placeholder="课程标题" required class="input-field" />
+      <input v-model="editingCourse.instructor" type="text" placeholder="授课老师" required class="input-field" />
+      <input v-model="editingCourse.duration" type="number" placeholder="课程时长" required class="input-field" />
+      <input v-model="editingCourse.url" type="url" placeholder="课程链接" required class="input-field" />
+      <button @click="updateCourse" class="submit-button">更新课程</button>
+      <button @click="cancelEdit" class="cancel-button">取消</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 
-const categories = ref(['编程', '语言', '艺术', '设计', '商业']);
-const selectedCategory = ref('');
-const sortBy = ref('hot');
-const searchQuery = ref('');
+const router = useRouter();
+const courses = ref([]);
+const newCourse = ref({ title: '', instructor: '', duration: '', url: '' });
+const editingCourse = ref(null);
+const loading = ref(false);
+const error = ref(null);
 
-// 模拟课程数据
-const courses = ref([
-  {
-    id: 1,
-    title: 'Vue3 入门实战',
-    category: '编程',
-    cover: 'https://via.placeholder.com/300x200',
-    instructor: '张老师',
-    rating: 4.8,
-    students: 1520,
-    createdAt: '2024-03-01'
-  },
-  // 更多模拟数据...
-]);
+const fetchCourses = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    const response = await axios.get('http://47.76.51.193:8383/api/courses');
+    courses.value = response.data;
+  } catch (err) {
+    error.value = '获取课程失败';
+  } finally {
+    loading.value = false;
+  }
+};
 
-const filteredCourses = computed(() => {
-  return courses.value
-    .filter(course => 
-      (selectedCategory.value ? course.category === selectedCategory.value : true) &&
-      (course.title.includes(searchQuery.value) || course.instructor.includes(searchQuery.value))
-    )
-    .sort((a, b) => {
-      if (sortBy.value === 'hot') return b.students - a.students;
-      return new Date(b.createdAt) - new Date(a.createdAt);
+const addCourse = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    await axios.post('http://47.76.51.193:8383/api/courses', newCourse.value);
+    newCourse.value = { title: '', instructor: '', duration: '', url: '' };
+    await fetchCourses();
+  } catch (err) {
+    error.value = '添加课程失败';
+  } finally {
+    loading.value = false;
+  }
+};
+
+const removeCourse = async (id) => {
+  loading.value = true;
+  error.value = null;
+  try {
+    await axios.delete(`http://47.76.51.193:8383/api/courses/${id}`);
+    await fetchCourses();
+  } catch (err) {
+    error.value = '删除课程失败';
+  } finally {
+    loading.value = false;
+  }
+};
+
+const editCourse = (course) => {
+  editingCourse.value = { ...course };
+};
+
+const updateCourse = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    await axios.put(`http://47.76.51.193:8383/api/courses/${editingCourse.value.id}`, {
+      title: editingCourse.value.title,
+      instructor: editingCourse.value.instructor,
+      duration: editingCourse.value.duration,
+      url: editingCourse.value.url
     });
-});
+    await fetchCourses();
+    editingCourse.value = null;
+  } catch (err) {
+    error.value = '更新课程失败';
+  } finally {
+    loading.value = false;
+  }
+};
+
+const cancelEdit = () => {
+  editingCourse.value = null;
+};
+
+onMounted(fetchCourses);
 </script>
 
 <style scoped>
 .course-list-container {
-  max-width: 1200px;
-  margin: 30px auto;
-  padding: 0 20px;
-}
-
-.filter-section {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 30px;
-}
-
-.filter-select, .search-input {
-  padding: 8px 12px;
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 20px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.course-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
-}
-
-.course-card {
-  background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
 }
 
-.course-card:hover {
-  transform: translateY(-5px);
-}
-
-.course-cover {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 8px 8px 0 0;
-}
-
-.course-info {
-  padding: 15px;
-}
-
-.course-title {
-  margin: 0 0 10px;
+h2 {
   color: #333;
-  font-size: 1.1em;
 }
 
-.instructor {
-  color: #666;
-  margin: 0 0 8px;
-  font-size: 0.9em;
+.input-field {
+  padding: 12px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
 }
 
-.rating-section {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.submit-button {
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #42b983;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.stars {
-  color: #ffd700;
+.submit-button:hover {
+  background-color: #36a77a;
 }
 
-.star.filled {
-  color: #ffd700;
+.loading-message {
+  text-align: center;
+  color: #007bff;
 }
 
-.star:not(.filled) {
-  color: #ddd;
+.error-message {
+  color: red;
+  text-align: center;
 }
 
-.students {
-  color: #666;
-  font-size: 0.9em;
+.course-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th,
+td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.video-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.video-link:hover {
+  text-decoration: underline;
+}
+
+.action-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-button {
+  background-color: #e57373;
+  color: white;
+  margin-right: 5px;
+}
+
+.edit-button {
+  background-color: #64b5f6;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #ef5350;
+}
+
+.edit-button:hover {
+  background-color: #42a5f5;
+}
+
+.edit-course-form {
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
 }
 </style>

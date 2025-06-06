@@ -2,9 +2,9 @@
     <div class="login-container">
         <h2>登录</h2>
         <form @submit.prevent="login" class="login-form">
-            <input type="text" v-model="username" placeholder="手机号或邮箱" required class="input-field" />
+            <input type="text" v-model="email" placeholder="邮箱" required class="input-field" />
             <input type="password" v-model="password" placeholder="密码" required class="input-field" />
-            <button type="submit" class="submit-button">登录</button>
+            <button type="submit" class="submit-button" :disabled="loading">{{ loading ? '登录中...' : '登录' }}</button>
         </form>
         <p class="register-link">
             没有账号? <router-link to="/register">注册</router-link>
@@ -14,14 +14,47 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus'; // 引入 Element Plus 的消息提示
+import axios from 'axios';
 
-const username = ref('');
+// 定义响应式变量
+const email = ref(''); // 使用 email 代替 username
 const password = ref('');
+const router = useRouter();
+const loading = ref(false); // 加载状态
 
-const login = () => {
-    // 登录逻辑
-    console.log('登录:', username.value, password.value);
-    // 在这里可以添加 API 调用进行用户登录
+// 登录函数
+const login = async () => {
+    loading.value = true; // 开始加载
+    try {
+        const response = await axios.post('http://47.76.51.193:8383/api/users/login', null, {
+            params: {
+                email: email.value,
+                password: password.value
+            },
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status === 200) {
+            
+            // 处理成功登录逻辑，例如重定向到主页
+            ElMessage.success('登录成功！');
+            router.push('/nav'); // 替换为您的主页路由
+        }
+    } catch (error) {
+        if (error.response) {
+            console.error('响应错误:', error.response.data);
+            ElMessage.error(error.response.data.message || '登录失败，请重试。');
+        } else {
+            console.error('其他错误:', error.message);
+            ElMessage.error('发生错误，请重试。');
+        }
+    } finally {
+        loading.value = false; // 完成加载
+    }
 };
 </script>
 

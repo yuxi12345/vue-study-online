@@ -2,10 +2,7 @@
   <!-- 全局提示弹窗 -->
   <div class="toast-container">
     <transition-group name="toast">
-      <div v-for="msg in messages" 
-           :key="msg.id"
-           class="toast"
-           :class="msg.type">
+      <div v-for="msg in messages" :key="msg.id" class="toast" :class="msg.type">
         <span class="toast-text">{{ msg.text }}</span>
       </div>
     </transition-group>
@@ -25,32 +22,25 @@
 
       <!-- 视频预览 -->
       <div class="video-container">
-        <video width="100%" autoplay controls src="https://sf1-cdn-tos.huoshanstatic.com/obj/media-fe/xgplayer_doc_video/mp4/xgplayer-demo-360p.mp4"></video>
+        <video width="100%" autoplay controls
+          src="https://sf1-cdn-tos.huoshanstatic.com/obj/media-fe/xgplayer_doc_video/mp4/xgplayer-demo-360p.mp4"></video>
       </div>
 
       <!-- 操作按钮组 -->
       <div class="action-container">
-        <button class="btn btn-primary" 
-                @click="handlePurchase"
-                v-if="!purchased">
+        <button class="btn btn-primary" @click="handlePurchase" v-if="!purchased">
           🛒 立即购买 ¥{{ course.price }}
         </button>
-        <button class="btn btn-success" 
-                v-else
-                disabled>
+        <button class="btn btn-success" v-else disabled>
           ✓ 已购买
         </button>
-        
+
         <div class="secondary-actions">
-          <button class="btn btn-icon" 
-                  :class="{ 'active': isFavorited }"
-                  @click="toggleFavorite">
+          <button class="btn btn-icon" :class="{ 'active': isFavorited }" @click="toggleFavorite">
             <span v-if="isFavorited">❤️ 已收藏</span>
             <span v-else>♡ 收藏</span>
           </button>
-          <button class="btn btn-icon" 
-                  :class="{ 'active': isInPlan }"
-                  @click="toggleStudyPlan">
+          <button class="btn btn-icon" :class="{ 'active': isInPlan }" @click="toggleStudyPlan">
             <span v-if="isInPlan">📚 已加入计划</span>
             <span v-else>📚 学习计划</span>
           </button>
@@ -66,21 +56,19 @@
           开始学习（文字）
         </router-link>
       </div>
-      
+
       <!-- 课程详情 -->
       <div class="course-detail">
         <!-- 大纲模块 -->
         <section class="detail-section">
           <h2 class="section-title">📖 课程大纲</h2>
           <ul class="chapter-list">
-            <li v-for="(chapter, index) in course.chapters" 
-                :key="index"
-                class="chapter-item">
+            <li v-for="(chapter, index) in course.chapters" :key="index" class="chapter-item">
               <div class="chapter-content">
-              <span>第{{ index + 1 }}章</span>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <span class="chapter-title">{{ chapter }}</span>
-            </div>
+                <span>第{{ index + 1 }}章</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="chapter-title">{{ chapter }}</span>
+              </div>
             </li>
           </ul>
         </section>
@@ -88,9 +76,7 @@
         <!-- 评价模块 -->
         <section class="detail-section">
           <h2 class="section-title">💬 学员评价</h2>
-          <div v-for="review in course.reviews" 
-               :key="review.id"
-               class="review-card">
+          <div v-for="review in course.reviews" :key="review.id" class="review-card">
             <p class="review-content">{{ review.content }}</p>
             <div class="review-footer">
               <span class="review-author">{{ review.author }}</span>
@@ -102,22 +88,20 @@
         <!-- 常见问题 -->
         <section class="detail-section">
           <h2 class="section-title">❓ 常见问题</h2>
-          <div v-for="qa in course.faqs" 
-               :key="qa.question"
-               class="faq-card">
+          <div v-for="qa in course.faqs" :key="qa.question" class="faq-card">
             <div class="faq-question">张三: {{ qa.question }}</div>
             <div class="faq-answer">李四: {{ qa.answer }}</div>
           </div>
         </section>
       </div>
+
+      <el-button type="primary" round><router-link to="/nav">返回</router-link></el-button>
     </main>
 
     <!-- 侧边信息栏 -->
     <aside class="course-sidebar">
       <div class="info-card">
-        <img :src="course.cover" 
-             alt="课程封面" 
-             class="course-cover">
+        <img :src="course.cover" alt="课程封面" class="course-cover">
         <div class="info-group">
           <label>👨🏫 讲师</label>
           <p class="info-content">{{ course.instructor }}</p>
@@ -133,27 +117,9 @@
       </div>
     </aside>
 
-<section class="detail-section">
-  <h2 class="section-title">🎮 课程互动</h2>
-  <div class="interaction-nav">
-    <router-link 
-  :to="`/courses/${course.id}/discussion`" 
-  class="nav-button"
-  active-class="active">
-  讨论区
-</router-link>
 
-<router-link 
-  :to="`/courses/${course.id}/qa`" 
-  class="nav-button"
-  active-class="active">
-  问答社区
-</router-link>
-  </div>
-</section>
-
-<!-- 添加路由出口 -->
-<router-view></router-view>
+    <!-- 添加路由出口 -->
+    <router-view></router-view>
 
   </div>
 </template>
